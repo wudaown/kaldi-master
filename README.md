@@ -1,5 +1,6 @@
 # docker-kaldi-gstreamer-server
 Dockerfile for [kaldi-gstreamer-server](https://github.com/alumae/kaldi-gstreamer-server).
+Taken from [docker-kaldi-gstreamer-server](https://github.com/jcsilva/docker-kaldi-gstreamer-server)
 
 Synopsis
 --------
@@ -27,60 +28,19 @@ Please, refer to https://docs.docker.com/engine/installation/.
 Get the image
 -------------
 
-* Pull the image from Docker Hub (~ 900MB):
 
-`docker pull jcsilva/docker-kaldi-gstreamer-server`
+* you may build your own image (requires git):
 
-* Or you may build your own image (requires git):
-
-`docker build -t kaldi-gstreamer-server:1.0 https://github.com/jcsilva/docker-kaldi-gstreamer-server.git`
-
-In the next sections I'll assume you pulled the image from Docker Hub. If you have built your own image, simply change *jcsilva/docker-kaldi-gstreamer-server:latest* by your image name when appropriate.
+`docker build -t kaldi .`
 
 
 How to use
 ----------
 
-It's possible to use the same docker in two scenarios. You may create the master and worker on the same host machine. Or you can create just a worker and connect it to an already existing master. These two situations are explained below. 
-
-* Instantiate master server and worker server on the same machine:
-
-Assuming that your kaldi models are located at /media/kaldi_models on your host machine, create a container:
-
 ```
-docker run -it -p 8080:80 -v /media/kaldi_models:/opt/models jcsilva/docker-kaldi-gstreamer-server:latest /bin/bash
+docker run -d --name master -p 8080:80 -v /media/kaldi_models:/opt/models kaldi
 ```
 
-And, inside the container, start the service:
-
-```
- /opt/start.sh -y /opt/models/nnet2.yaml
-```
-
-You will see that 2 .log files (worker.log and master.log) will be created at /opt of your containter. If everything goes ok, you will see some lines indicating that there is a worker available. In this case, you can go back to your host machine (`Ctrl+P and Ctrl+Q` on the container). Your ASR service will be listening on port 8080.
-
-For stopping the servers, you may execute the following command inside your container:
-```
- /opt/stop.sh
-```
-
-* Instantiate a worker server and connect it to a remote master:
-
-Assuming that your kaldi models are located at /media/kaldi_models on your host machine, create a container:
-
-```
-docker run -it -v /media/kaldi_models:/opt/models jcsilva/docker-kaldi-gstreamer-server:latest /bin/bash
-```
-
-And, inside the container, start the service:
-
-```
-/opt/start.sh -y /opt/models/nnet2.yaml -m master-server.com -p 8888
-```
-
-It instantiates a worker on your local host and connects it to a master server located at master-server.com:8888. 
-
-You will see that a worker.log file will be created at /opt of your container. If everything goes ok, you will see some lines indicating that there is a worker available.
 
 For stopping the worker server, you may execute the following command inside your container:
 ```
